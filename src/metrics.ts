@@ -1,0 +1,63 @@
+import type { Dispatcher } from "@mtcute/dispatcher";
+import type { TelegramClient } from "@mtcute/node";
+import { PropagationAction } from "@mtcute/dispatcher";
+import { Counter, Gauge } from "prom-client";
+
+import { newKeywordsCounter, newWordsCounter } from "./keywords.js";
+
+function newMessagesCounter(dp: Dispatcher) {
+    const counter = new Counter({
+        name: "messenger_dialog_messages_count",
+        help: "Messages count since exporter startup",
+        labelNames: ["peerId"],
+    });
+    dp.onNewMessage(async (msg) => {
+        counter.inc({
+            peerId: msg.chat.id,
+        });
+        return PropagationAction.Continue;
+    });
+    return counter;
+}
+
+function newStaticPeerInfoGauge(tg: TelegramClient) {
+    const gauge = new Gauge({
+        name: "messenger_dialog_info",
+        help: "Dialog information exposed as labels",
+        labelNames: ["peerId", "peerType", "displayName"],
+        collect: async () => {
+            for await (const d of tg.iterDialogs()) {
+                gauge.set({
+                    peerId: d.peer.id,
+                    peerType: d.peer.type,
+                    displayName: d.peer.displayName,
+                }, 1);
+            }
+        },
+    });
+    return gauge;
+}
+
+function newUnreadCountGauge(tg: TelegramClient) {
+    const gauge = new Gauge({
+        name: "messenger_dialog_unread_messages_count",
+        help: "Number of unread messages in dialogs",
+        labelNames: ["peerId"],
+        collect: async () => {
+            for await (const d of tg.iterDialogs()) {
+                gauge.set({
+                    peerId: d.peer.id,
+                }, d.unreadCount);
+            }
+        },
+    });
+    return gauge;
+}
+
+export {
+    newKeywordsCounter,
+    newMessagesCounter,
+    newStaticPeerInfoGauge,
+    newUnreadCountGauge,
+    newWordsCounter,
+};

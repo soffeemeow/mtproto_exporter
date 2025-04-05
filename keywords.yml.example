@@ -1,0 +1,4 @@
+keywords:
+    - meow
+    - name: woof
+      pattern: 'w[oa]+f'
