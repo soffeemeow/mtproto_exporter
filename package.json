@@ -1,0 +1,29 @@
+{
+    "name": "mtproto_exporter",
+    "type": "module",
+    "version": "0.0.1",
+    "packageManager": "pnpm@10.6.5",
+    "license": "MIT",
+    "scripts": {
+        "lint": "eslint .",
+        "lint:fix": "eslint --fix .",
+        "start": "dotenv tsx ./src/main.ts",
+        "build": "tsc"
+    },
+    "dependencies": {
+        "@mtcute/dispatcher": "^0.22.2",
+        "@mtcute/node": "^0.22.3",
+        "dotenv-cli": "^8.0.0"
+    },
+    "devDependencies": {
+        "@antfu/eslint-config": "^4.11.0",
+        "@types/node": "^22.14.0",
+        "tsx": "^4.19.3",
+        "typescript": "^5.8.3"
+    },
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "better-sqlite3"
+        ]
+    }
+}
