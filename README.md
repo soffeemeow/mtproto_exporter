@@ -43,6 +43,7 @@ This metric can be enabled with command line flag `--words-counter`
 ## Environment Variables
 
 `API_ID` - Telegram api id used for mtproto connection (see [mtcute.dev](https://mtcute.dev/guide/intro/sign-in.html))
+
 `API_HASH` - Telegram api hash used for mtproto connection (see [mtcute.dev](https://mtcute.dev/guide/intro/sign-in.html))
 
 ## Development
