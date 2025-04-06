@@ -58,6 +58,14 @@ const tg = new TelegramClient({
 
 const dp = Dispatcher.for(tg);
 
+const user = await tg.start({
+    phone: () => env.USERBOT_PHONE ?? tg.input("Phone > "),
+    code: () => env.USERBOT_2FACODE ?? tg.input("Code > "),
+    password: () => env.USERBOT_PASSWORD ?? tg.input("Password > "),
+});
+
+console.log("Logged in as", user.username);
+
 registry.registerMetric(metrics.newStaticPeerInfoGauge(tg));
 registry.registerMetric(metrics.newUnreadCountGauge(tg));
 registry.registerMetric(metrics.newMessagesCounter(dp));
@@ -69,6 +77,3 @@ if (keywords.length > 0) {
 if (cli["words-counter"]) {
     registry.registerMetric(metrics.newWordsCounter(dp));
 }
-
-const user = await tg.start();
-console.log("Logged in as", user.username);
