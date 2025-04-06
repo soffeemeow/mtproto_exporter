@@ -1,5 +1,5 @@
-FROM node:20-alpine
-WORKDIR /app
+FROM node:22-alpine AS build
+WORKDIR /build
 
 RUN apk add python3 make g++ && \
     corepack enable && \
@@ -8,7 +8,14 @@ RUN apk add python3 make g++ && \
 COPY package*.json pnpm*.yaml tsconfig.json ./
 RUN pnpm install --frozen-lockfile
 
-COPY src /app/src
+COPY src ./src
 RUN pnpm run build
+RUN pnpm prune --prod
 
-CMD [ "node", "/app/dist/main.js" ]
+FROM node:22-alpine
+WORKDIR /app
+COPY --from=build /build/package*.json ./
+COPY --from=build /build/dist ./dist
+COPY --from=build /build/node_modules ./node_modules
+
+ENTRYPOINT [ "docker-entrypoint.sh", "node", "/app/dist/main.js" ]
