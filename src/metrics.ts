@@ -26,6 +26,7 @@ function newStaticPeerInfoGauge(tg: TelegramClient) {
         help: "Dialog information exposed as labels",
         labelNames: ["peerId", "peerType", "displayName"],
         collect: async () => {
+            gauge.reset();
             for await (const d of tg.iterDialogs()) {
                 gauge.set({
                     peerId: d.peer.id,
@@ -44,6 +45,7 @@ function newUnreadCountGauge(tg: TelegramClient) {
         help: "Number of unread messages in dialogs",
         labelNames: ["peerId"],
         collect: async () => {
+            gauge.reset();
             for await (const d of tg.iterDialogs()) {
                 gauge.set({
                     peerId: d.peer.id,
