@@ -1,21 +1,27 @@
 FROM node:22-alpine AS build
 WORKDIR /build
 
-RUN apk add python3 make g++ && \
-    corepack enable && \
-    corepack prepare pnpm@8.7.1 --activate
+RUN apk add python3 make g++ && corepack enable
 
 COPY package*.json pnpm*.yaml tsconfig.json ./
 RUN pnpm install --frozen-lockfile
 
 COPY src ./src
-RUN pnpm run build
-RUN pnpm prune --prod
+RUN pnpm run build && pnpm prune --prod
 
-FROM node:22-alpine
+FROM node:22-alpine AS final
+
+ARG USERNAME=bot
+ARG USER_UID=1001
+ARG USER_GID=$USER_UID
+
+RUN adduser -D -u $USER_UID -h /app $USERNAME $USER_GID
+
+USER $USERNAME
+
 WORKDIR /app
 COPY --from=build /build/package*.json ./
 COPY --from=build /build/dist ./dist
 COPY --from=build /build/node_modules ./node_modules
 
-ENTRYPOINT [ "docker-entrypoint.sh", "node", "/app/dist/main.js" ]
+ENTRYPOINT [ "docker-entrypoint.sh", "node", "dist/main.js" ]
