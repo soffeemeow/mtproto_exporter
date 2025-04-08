@@ -1,7 +1,7 @@
 {
     "name": "mtproto_exporter",
     "type": "module",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "packageManager": "pnpm@10.6.5",
     "license": "MIT",
     "scripts": {

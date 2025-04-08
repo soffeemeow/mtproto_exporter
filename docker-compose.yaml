@@ -8,3 +8,10 @@ services:
       - .env
     volumes:
       - ./bot-data:/app/bot-data
+      - ./keywords.yml:/app/keywords.yml
+    command:
+      - "--keywords-file"
+      - "/app/keywords.yml"
+      - "--watch-file"
+    ports:
+      - 127.0.0.1:9669:9669
