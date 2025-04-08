@@ -5,7 +5,7 @@ import { Counter, Gauge } from "prom-client";
 
 import { config } from "./config.js";
 import { peersConfigBoolFilter, peersConfigFilter } from "./filters.js";
-import { KeywordsCounter, newWordsCounter } from "./keywords.js";
+import { KeywordsCounter } from "./keywords.js";
 
 function newMessagesCounter(dp: Dispatcher) {
     const counter = new Counter({
@@ -65,6 +65,25 @@ function newUnreadCountGauge(tg: TelegramClient) {
         },
     });
     return gauge;
+}
+
+function newWordsCounter(dp: Dispatcher) {
+    const counter = new Counter({
+        name: "messenger_dialog_words_count",
+        help: "Number of words in messages since exporter startup",
+        labelNames: ["peerId", "word"],
+    });
+    dp.onNewMessage(peersConfigFilter(config), async (msg) => {
+        const words = msg.text.toLowerCase().split(" ");
+        for (const w of words) {
+            counter.inc({
+                peerId: msg.chat.id,
+                word: w,
+            });
+        }
+        return PropagationAction.Continue;
+    });
+    return counter;
 }
 
 export {

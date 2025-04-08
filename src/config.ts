@@ -1,5 +1,5 @@
 import type { OptionDefinition } from "command-line-args";
-import type { KeywordLike } from "./keywords.js";
+import type { RawKeywordLike } from "./keywords.js";
 import { readFile } from "node:fs/promises";
 import cmdline from "command-line-args";
 import yaml from "js-yaml";
@@ -12,7 +12,7 @@ export interface Configuration {
     watchFile: boolean;
     includePeers?: number[];
     excludePeers?: number[];
-    keywords?: KeywordLike[];
+    keywords?: RawKeywordLike[];
 }
 
 const optionDefinitions: OptionDefinition[] = [
@@ -54,19 +54,22 @@ if (cli["exclude-peers"]) {
     }
 }
 
-export async function readKeywords(filePath: string): Promise<KeywordLike[]> {
+export async function readKeywords(filePath: string): Promise<RawKeywordLike[]> {
     const doc = yaml.load(await readFile(filePath, "utf8")) as { keywords?: any[] };
 
     if (doc.keywords && doc.keywords.constructor.name === "Array") {
-        const keywords: KeywordLike[] = [];
+        const keywords: RawKeywordLike[] = [];
         for (const item of doc.keywords) {
             if (typeof item === "string") {
                 keywords.push(item);
-            } else if (typeof item === "object" && item.name && item.pattern) {
-                keywords.push({
-                    name: item.name,
-                    pattern: new RegExp(item.pattern, "gi"),
-                });
+            } else if (typeof item === "object" && typeof item.name === "string") {
+                if (typeof item.pattern === "string") {
+                    keywords.push({
+                        name: item.name,
+                        pattern: item.pattern,
+                        word: Boolean(item.word ?? false),
+                    });
+                }
             }
         }
         return keywords;

@@ -5,6 +5,7 @@ import { collectDefaultMetrics, Registry } from "prom-client";
 
 import { config, readKeywords } from "./config.js";
 import * as env from "./env.js";
+import { rawToPatterns } from "./keywords.js";
 import * as metrics from "./metrics.js";
 import MetricsServer from "./server.js";
 
@@ -36,7 +37,7 @@ registry.registerMetric(metrics.newUnreadCountGauge(tg));
 registry.registerMetric(metrics.newMessagesCounter(dp));
 
 if (config.keywords) {
-    const counter = new metrics.KeywordsCounter(dp, config.keywords);
+    const counter = new metrics.KeywordsCounter(dp, rawToPatterns(config.keywords));
     registry.registerMetric(counter);
 
     if (config.watchFile) {
@@ -47,7 +48,7 @@ if (config.keywords) {
             console.log("[watch-file] Keywords file was updated. Re-reading keywords configuration...");
             try {
                 config.keywords = await readKeywords(config.keywordsFile);
-                counter.setKeywords(config.keywords);
+                counter.setKeywords(rawToPatterns(config.keywords));
             } catch (e) {
                 console.error("Failed to read keywords file", config.keywordsFile, e);
             }

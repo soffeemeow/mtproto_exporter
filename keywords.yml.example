@@ -1,4 +1,19 @@
 keywords:
+    # will match just word 'meow' (requires word border on both sides)
     - meow
+
+    # will match plain regex
     - name: woof
       pattern: 'w[oa]+f'
+
+    # will match regex wraped with word borders
+    # will match 'hi, woof :3', 'woof!', 'i heard a woof' but not 'i like subwoofers'
+    - name: woof
+      pattern: 'w[oa]+f'
+      word: true
+
+    # will match any word starting with 'aqua' (aquarium, aquatic, aquaculture, etc...)
+    # requires word border on both sides too
+    - name: aqua
+      pattern: 'aqua.*?'
+      word: true
