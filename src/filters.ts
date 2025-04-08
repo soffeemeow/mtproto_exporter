@@ -1,18 +1,18 @@
+import type { Configuration } from "./config.js";
 import { filters } from "@mtcute/dispatcher";
-import { Configuration } from "./config.js";
 
 export function peersConfigBoolFilter(conf: Configuration, peerId: number) {
-    if(conf.excludePeers && conf.excludePeers.indexOf(peerId) !== -1) {
+    if (conf.excludePeers && conf.excludePeers.includes(peerId)) {
         return false;
     }
-    if(conf.includePeers && conf.includePeers.indexOf(peerId) === -1) {
+    if (conf.includePeers && !conf.includePeers.includes(peerId)) {
         return false;
     }
     return true;
 }
 
 export function peersConfigFilter(conf: Configuration) {
-    if(conf.excludePeers) {
+    if (conf.excludePeers) {
         return filters.not(filters.chatId(conf.excludePeers));
     } else if (conf.includePeers) {
         return filters.chatId(conf.includePeers);

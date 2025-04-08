@@ -3,9 +3,9 @@ import type { TelegramClient } from "@mtcute/node";
 import { PropagationAction } from "@mtcute/dispatcher";
 import { Counter, Gauge } from "prom-client";
 
-import { KeywordsCounter, newWordsCounter } from "./keywords.js";
 import { config } from "./config.js";
 import { peersConfigBoolFilter, peersConfigFilter } from "./filters.js";
+import { KeywordsCounter, newWordsCounter } from "./keywords.js";
 
 function newMessagesCounter(dp: Dispatcher) {
     const counter = new Counter({
@@ -31,7 +31,7 @@ function newStaticPeerInfoGauge(tg: TelegramClient) {
         collect: async () => {
             gauge.reset();
             for await (const d of tg.iterDialogs()) {
-                if(!peersConfigBoolFilter(config, d.peer.id)) {
+                if (!peersConfigBoolFilter(config, d.peer.id)) {
                     continue;
                 }
 
@@ -54,7 +54,7 @@ function newUnreadCountGauge(tg: TelegramClient) {
         collect: async () => {
             gauge.reset();
             for await (const d of tg.iterDialogs()) {
-                if(!peersConfigBoolFilter(config, d.peer.id)) {
+                if (!peersConfigBoolFilter(config, d.peer.id)) {
                     continue;
                 }
 

@@ -1,8 +1,8 @@
 import type { Dispatcher } from "@mtcute/dispatcher";
 import { PropagationAction } from "@mtcute/dispatcher";
 import { Counter } from "prom-client";
-import { peersConfigFilter } from "./filters.js";
 import { config } from "./config.js";
+import { peersConfigFilter } from "./filters.js";
 
 interface KeywordPattern {
     name: string;

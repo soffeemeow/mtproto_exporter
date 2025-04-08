@@ -42,12 +42,12 @@ This metric can be enabled with command line flag `--words-counter`
 
 `--watch-file`, `-w` - watch for keywords file updates and reload keywords configuration in runtime
 
-`--include-peers`, `-i` - comma-separated list of `peer.id`s to gather metrics from. 
-if set, only specified peers will be exposed in metrics. 
+`--include-peers`, `-i` - comma-separated list of `peer.id`s to gather metrics from.
+if set, only specified peers will be exposed in metrics.
 can be specified multiple times. can not be used along with `--exclude-peers`
 
-`--exclude-peers` `x` - comma-separated list of `peer.id`s to exclude from metrics. 
-if set, specified peers will not be exposed in metrics. 
+`--exclude-peers` `x` - comma-separated list of `peer.id`s to exclude from metrics.
+if set, specified peers will not be exposed in metrics.
 can be specified multiple times. can not be used along with `--include-peers`
 
 ## Environment Variables

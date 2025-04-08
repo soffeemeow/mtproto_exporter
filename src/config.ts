@@ -43,14 +43,14 @@ if (cli["include-peers"] && cli["exclude-peers"]) {
 if (cli["include-peers"]) {
     config.includePeers = [];
     for (const o of cli["include-peers"] as string[]) {
-        config.includePeers.push(...o.split(",").map(i => parseInt(i)).filter(i => !isNaN(i)));
+        config.includePeers.push(...o.split(",").map(i => Number.parseInt(i)).filter(i => !Number.isNaN(i)));
     }
 }
 
 if (cli["exclude-peers"]) {
     config.excludePeers = [];
     for (const o of cli["exclude-peers"] as string[]) {
-        config.excludePeers.push(...o.split(",").map(i => parseInt(i)).filter(i => !isNaN(i)));
+        config.excludePeers.push(...o.split(",").map(i => Number.parseInt(i)).filter(i => !Number.isNaN(i)));
     }
 }
 
