@@ -5,8 +5,8 @@ import { collectDefaultMetrics, Registry } from "prom-client";
 
 import { config, readKeywords } from "./config.js";
 import * as env from "./env.js";
-import { rawToPatterns } from "./keywords.js";
-import * as metrics from "./metrics.js";
+import { rawToPatterns } from "./metrics/keywords.js";
+import * as metrics from "./metrics/metrics.js";
 import MetricsServer from "./server.js";
 
 const registry = new Registry();

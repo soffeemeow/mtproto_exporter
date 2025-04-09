@@ -1,5 +1,5 @@
 import type { OptionDefinition } from "command-line-args";
-import type { RawKeywordLike } from "./keywords.js";
+import type { RawKeywordLike } from "./metrics/keywords.js";
 import { readFile } from "node:fs/promises";
 import cmdline from "command-line-args";
 import yaml from "js-yaml";
