@@ -1,6 +1,6 @@
 import type { Dialog, TelegramClient } from "@mtcute/node";
 
-import type { Registry } from "prom-client";
+import { Registry, Summary } from "prom-client";
 import process from "node:process";
 import timers from "node:timers/promises";
 
@@ -53,6 +53,7 @@ class DialogsHolder {
     private ttl: bigint;
 
     private dialogsIterDurationHistogram: Histogram;
+    private dialogsIterDurationSummary: Summary;
 
     constructor(private tg: TelegramClient, ttl: number, private timeout: number, private pollInterval = 10) {
         this.ttl = BigInt(ttl) * 1000000n;
@@ -60,10 +61,15 @@ class DialogsHolder {
             name: "telegram_api_dialogs_iter_duration",
             help: "Duration of iteration over telegram dialogs",
         });
+        this.dialogsIterDurationSummary = new Summary({
+            name: "telegram_api_dialogs_iter_duration_summary",
+            help: "Duration of iteration over telegram dialogs",
+        });
     }
 
     public registerMetrics(registry: Registry) {
         registry.registerMetric(this.dialogsIterDurationHistogram);
+        registry.registerMetric(this.dialogsIterDurationSummary);
     }
 
     public async get() {
@@ -85,7 +91,7 @@ class DialogsHolder {
                 }
                 this.dialogs.push(d);
             }
-            end();
+            this.dialogsIterDurationSummary.observe(end());
             this.lastUpdate = process.hrtime.bigint();
             this.isUpdating = false;
         }
