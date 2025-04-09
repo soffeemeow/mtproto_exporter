@@ -32,8 +32,7 @@ const user = await tg.start({
 
 console.log("Logged in as", user.username);
 
-registry.registerMetric(metrics.newStaticPeerInfoGauge(tg));
-registry.registerMetric(metrics.newUnreadCountGauge(tg));
+metrics.collectDialogMetrics(tg, registry);
 metrics.collectNewMessageMetrics(dp, registry);
 
 if (config.keywords) {
