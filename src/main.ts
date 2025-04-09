@@ -34,7 +34,7 @@ console.log("Logged in as", user.username);
 
 registry.registerMetric(metrics.newStaticPeerInfoGauge(tg));
 registry.registerMetric(metrics.newUnreadCountGauge(tg));
-registry.registerMetric(metrics.newMessagesCounter(dp));
+metrics.collectNewMessageMetrics(dp, registry);
 
 if (config.keywords) {
     const counter = new metrics.KeywordsCounter(dp, rawToPatterns(config.keywords));
