@@ -2,9 +2,9 @@ import type { Dialog, TelegramClient } from "@mtcute/node";
 
 import type { Registry } from "prom-client";
 import process from "node:process";
-
 import timers from "node:timers/promises";
-import { Gauge } from "prom-client";
+
+import { Gauge, Histogram } from "prom-client";
 import { config } from "../config.js";
 import { peersConfigBoolFilter } from "../filters.js";
 
@@ -41,6 +41,7 @@ export function collectDialogMetrics(tg: TelegramClient, registry: Registry) {
         },
     });
 
+    dialogs.registerMetrics(registry);
     registry.registerMetric(info);
     registry.registerMetric(unread);
 }
@@ -51,8 +52,18 @@ class DialogsHolder {
     private isUpdating = false;
     private ttl: bigint;
 
+    private dialogsIterDurationHistogram: Histogram;
+
     constructor(private tg: TelegramClient, ttl: number, private timeout: number, private pollInterval = 10) {
         this.ttl = BigInt(ttl) * 1000000n;
+        this.dialogsIterDurationHistogram = new Histogram({
+            name: "telegram_api_dialogs_iter_duration",
+            help: "Duration of iteration over telegram dialogs",
+        });
+    }
+
+    public registerMetrics(registry: Registry) {
+        registry.registerMetric(this.dialogsIterDurationHistogram);
     }
 
     public async get() {
@@ -67,12 +78,14 @@ class DialogsHolder {
         if (process.hrtime.bigint() - this.lastUpdate > this.ttl) {
             this.isUpdating = true;
             this.dialogs = [];
+            const end = this.dialogsIterDurationHistogram.startTimer();
             for await (const d of this.tg.iterDialogs()) {
                 if (!peersConfigBoolFilter(config, d.peer.id)) {
                     continue;
                 }
                 this.dialogs.push(d);
             }
+            end();
             this.lastUpdate = process.hrtime.bigint();
             this.isUpdating = false;
         }
