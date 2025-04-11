@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import { Dispatcher } from "@mtcute/dispatcher";
 import { TelegramClient } from "@mtcute/node";
-import { collectDefaultMetrics, Registry } from "prom-client";
 
+import { collectDefaultMetrics, Registry } from "prom-client";
 import { config, readKeywords } from "./config.js";
 import * as env from "./env.js";
 import { rawToPatterns } from "./metrics/keywords.js";
@@ -34,6 +34,7 @@ console.log("Logged in as", user.username);
 
 metrics.collectDialogMetrics(tg, registry);
 metrics.collectNewMessageMetrics(dp, registry);
+metrics.collectReactionsMetrics(tg, dp, registry);
 
 if (config.keywords) {
     const counter = new metrics.KeywordsCounter(dp, rawToPatterns(config.keywords));

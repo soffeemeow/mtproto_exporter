@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   bot:
     build:
@@ -13,5 +12,6 @@ services:
       - "--keywords-file"
       - "/app/keywords.yml"
       - "--watch-file"
+      - "--reactions-collector-load-history"
     ports:
-      - 127.0.0.1:9669:9669
+      - 0.0.0.0:9669:9669

@@ -9,6 +9,7 @@ import { peersConfigFilter } from "../filters.js";
 import { collectDialogMetrics } from "./dialogs.js";
 import { KeywordsCounter } from "./keywords.js";
 import { collectNewMessageMetrics } from "./message.js";
+import { collectReactionsMetrics } from "./reactions.js";
 
 function newWordsCounter(dp: Dispatcher) {
     const counter = new Counter({
@@ -32,6 +33,7 @@ function newWordsCounter(dp: Dispatcher) {
 export {
     collectDialogMetrics,
     collectNewMessageMetrics,
+    collectReactionsMetrics,
     KeywordsCounter,
     newWordsCounter,
 };

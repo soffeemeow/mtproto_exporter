@@ -13,6 +13,8 @@ export interface Configuration {
     includePeers?: number[];
     excludePeers?: number[];
     keywords?: RawKeywordLike[];
+    reactionsCollectorLoadHistory: boolean;
+    reactionsCollectorLoadHistorySize: number;
 }
 
 const optionDefinitions: OptionDefinition[] = [
@@ -23,6 +25,8 @@ const optionDefinitions: OptionDefinition[] = [
     { name: "watch-file", alias: "w", type: Boolean, defaultValue: false },
     { name: "include-peers", alias: "i", type: String, multiple: true },
     { name: "exclude-peers", alias: "x", type: String, multiple: true },
+    { name: "reactions-collector-load-history", type: Boolean, defaultValue: false },
+    { name: "reactions-collector-load-history-size", type: Number, defaultValue: 1000 },
 ];
 
 const cli = cmdline(optionDefinitions);
@@ -34,6 +38,8 @@ const config: Configuration = {
     keywordsFile: cli["keywords-file"],
     watchFile: cli["watch-file"],
     keywords: cli["keywords-file"] ? await readKeywords(cli["keywords-file"]) : undefined,
+    reactionsCollectorLoadHistory: cli["reactions-collector-load-history"],
+    reactionsCollectorLoadHistorySize: cli["reactions-collector-load-history-size"],
 };
 
 if (cli["include-peers"] && cli["exclude-peers"]) {

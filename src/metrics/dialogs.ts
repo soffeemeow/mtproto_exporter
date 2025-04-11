@@ -1,10 +1,10 @@
 import type { Dialog, TelegramClient } from "@mtcute/node";
 
-import { Registry, Summary } from "prom-client";
+import type { Registry } from "prom-client";
 import process from "node:process";
 import timers from "node:timers/promises";
+import { Gauge, Histogram, Summary } from "prom-client";
 
-import { Gauge, Histogram } from "prom-client";
 import { config } from "../config.js";
 import { peersConfigBoolFilter } from "../filters.js";
 
