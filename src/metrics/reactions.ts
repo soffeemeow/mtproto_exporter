@@ -115,10 +115,10 @@ export async function collectReactionsMetrics(tg: TelegramClient, dp: Dispatcher
     registry.registerMetric(messagesSize);
     registry.registerMetric(reactionsSize);
 
-    if (config.reactionsCollectorLoadHistory) {
+    if (config.reactionsCollector.loadHistory) {
         console.log("fetching dialogs history into reactions collector cache....");
         const historyIterOptions = {
-            limit: config.reactionsCollectorLoadHistorySize,
+            limit: config.reactionsCollector.loadHistorySize,
         };
         for await (const dialog of tg.iterDialogs()) {
             console.log("fetching dialog with peer id", dialog.peer.id);

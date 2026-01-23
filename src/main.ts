@@ -32,9 +32,18 @@ const user = await tg.start({
 
 console.log("Logged in as", user.username);
 
-metrics.collectDialogMetrics(tg, registry);
-metrics.collectNewMessageMetrics(dp, registry);
-metrics.collectReactionsMetrics(tg, dp, registry);
+if (config.collectors.dialogs) {
+    metrics.collectDialogMetrics(tg, registry);
+}
+
+if (config.collectors.messages) {
+    metrics.collectNewMessageMetrics(dp, registry);
+}
+
+if (config.collectors.reactions) {
+    console.log("[WARN] reactions-collector is enabled, but it is very experimental and almost does not work. i don't recommend enabling it especially for production use.")
+    metrics.collectReactionsMetrics(tg, dp, registry);
+}
 
 if (config.keywords) {
     const counter = new metrics.KeywordsCounter(dp, rawToPatterns(config.keywords));
@@ -45,7 +54,7 @@ if (config.keywords) {
             if (curr.mtimeMs === prev.mtimeMs) {
                 return;
             }
-            console.log("[watch-file] Keywords file was updated. Re-reading keywords configuration...");
+            console.log("[watch-file] Keywords file was updated. Reloading keywords configuration...");
             try {
                 config.keywords = await readKeywords(config.keywordsFile);
                 counter.setKeywords(rawToPatterns(config.keywords));

@@ -41,9 +41,27 @@ export function collectDialogMetrics(tg: TelegramClient, registry: Registry) {
         },
     });
 
+    const members = new Gauge({
+        name: "messenger_dialog_chat_members_count",
+        help: "Number of members in the chat",
+        labelNames: ["peerId"],
+        collect: async () => {
+            members.reset();
+            for (const d of await dialogs.get()) {
+                if (d.peer.type !== "chat") continue;
+                if (d.peer.membersCount === null) continue;
+                
+                members.set({
+                    peerId: d.peer.id,
+                }, d.peer.membersCount);
+            }
+        },
+    });
+
     dialogs.registerMetrics(registry);
     registry.registerMetric(info);
     registry.registerMetric(unread);
+    registry.registerMetric(members);
 }
 
 class DialogsHolder {

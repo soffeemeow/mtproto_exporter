@@ -13,20 +13,34 @@ export interface Configuration {
     includePeers?: number[];
     excludePeers?: number[];
     keywords?: RawKeywordLike[];
-    reactionsCollectorLoadHistory: boolean;
-    reactionsCollectorLoadHistorySize: number;
+    collectors: {
+        dialogs: boolean;
+        messages: boolean;
+        reactions: boolean;
+    }
+    reactionsCollector: {
+        loadHistory: boolean,
+        loadHistorySize: number,
+    },
+    messagesCollector: {
+        includeSender: boolean,
+    },
 }
 
 const optionDefinitions: OptionDefinition[] = [
-    { name: "bind-host", alias: "b", type: String, defaultValue: "0.0.0.0" },
-    { name: "port", alias: "p", type: Number, defaultValue: 9669 },
-    { name: "words-counter", type: Boolean, defaultValue: false },
-    { name: "keywords-file", alias: "k", type: String },
-    { name: "watch-file", alias: "w", type: Boolean, defaultValue: false },
-    { name: "include-peers", alias: "i", type: String, multiple: true },
-    { name: "exclude-peers", alias: "x", type: String, multiple: true },
-    { name: "reactions-collector-load-history", type: Boolean, defaultValue: false },
-    { name: "reactions-collector-load-history-size", type: Number, defaultValue: 1000 },
+    { name: "bind-host",                                alias: "b", type: String,   defaultValue:   "0.0.0.0"   },
+    { name: "port",                                     alias: "p", type: Number,   defaultValue:   9669        },
+    { name: "words-counter",                                        type: Boolean,  defaultValue:   false       },
+    { name: "keywords-file",                            alias: "k", type: String                                },
+    { name: "watch-file",                               alias: "w", type: Boolean,  defaultValue:   false       },
+    { name: "include-peers",                            alias: "i", type: String,   multiple:       true        },
+    { name: "exclude-peers",                            alias: "x", type: String,   multiple:       true        },
+    { name: "reactions-collector",                                  type: Boolean,  defaultValue:   false       },
+    { name: "reactions-collector-load-history",                     type: Boolean,  defaultValue:   false       },
+    { name: "reactions-collector-load-history-size",                type: Number,   defaultValue:   1000        },
+    { name: "dialogs-collector",                                    type: Boolean,  defaultValue:   true        },
+    { name: "messages-collector",                                   type: Boolean,  defaultValue:   true        },
+    { name: "messages-collector-include-sender",                    type: Boolean,  defaultValue:   false       },
 ];
 
 const cli = cmdline(optionDefinitions);
@@ -38,8 +52,18 @@ const config: Configuration = {
     keywordsFile: cli["keywords-file"],
     watchFile: cli["watch-file"],
     keywords: cli["keywords-file"] ? await readKeywords(cli["keywords-file"]) : undefined,
-    reactionsCollectorLoadHistory: cli["reactions-collector-load-history"],
-    reactionsCollectorLoadHistorySize: cli["reactions-collector-load-history-size"],
+    collectors: {
+        dialogs: cli["dialogs-collector"],
+        messages: cli["messages-collector"],
+        reactions: cli["reactions-collector"],
+    },
+    reactionsCollector: {
+        loadHistory: cli["reactions-collector-load-history"],
+        loadHistorySize: cli["reactions-collector-load-history-size"],
+    },
+    messagesCollector: {
+        includeSender: cli["messages-collector-include-sender"],
+    },
 };
 
 if (cli["include-peers"] && cli["exclude-peers"]) {
