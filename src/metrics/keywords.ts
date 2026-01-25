@@ -11,6 +11,11 @@ export interface RawKeywordPattern {
     name: string;
     pattern: string;
     word: boolean;
+    flags: {
+        global: boolean;
+        multi_line: boolean;
+        insensitive: boolean;
+    }
 }
 
 export type RawKeywordLike = string | RawKeywordPattern;
@@ -26,6 +31,7 @@ export function rawToPatterns(raw: RawKeywordLike[]): KeywordPattern[] {
         let pattern;
         let name;
         let addBorders = false;
+        let flags = "giu";
 
         if (typeof keyword === "string") {
             pattern = escapeRegex(keyword);
@@ -35,15 +41,28 @@ export function rawToPatterns(raw: RawKeywordLike[]): KeywordPattern[] {
             pattern = keyword.pattern;
             name = keyword.name;
             addBorders = keyword.word;
+
+            flags = "u";
+            if (keyword.flags.global) {
+                flags += "g";
+            }
+
+            if (keyword.flags.insensitive) {
+                flags += "i";
+            }
+
+            if (keyword.flags.multi_line) {
+                flags += "m";
+            }
         }
 
         const wordBorder = escapeRegex("!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
-        const borderStart = addBorders ? `(?:[${wordBorder}\\s]|^)` : "";
-        const borderEnd = addBorders ? `(?:[${wordBorder}\\s]|$)` : "";
+        const borderStart = addBorders ? `(?<=[${wordBorder}\\s]|^)` : "";
+        const borderEnd = addBorders ? `(?=[${wordBorder}\\s]|$)` : "";
 
         patterns.push({
             name,
-            pattern: new RegExp(borderStart + pattern + borderEnd),
+            pattern: new RegExp(`${borderStart}(?:${pattern})${borderEnd}`, flags),
         });
     }
 

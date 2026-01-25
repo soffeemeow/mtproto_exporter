@@ -94,11 +94,32 @@ export async function readKeywords(filePath: string): Promise<RawKeywordLike[]> 
                 keywords.push(item);
             } else if (typeof item === "object" && typeof item.name === "string") {
                 if (typeof item.pattern === "string") {
-                    keywords.push({
+                    let result = {
                         name: item.name,
                         pattern: item.pattern,
                         word: Boolean(item.word ?? false),
-                    });
+                        flags: {
+                            global: true,
+                            multi_line: false,
+                            insensitive: true,
+                        }
+                    };
+
+                    if (typeof item.flags === "object") {
+                        if (typeof item.flags.global === "boolean") {
+                            result.flags.global = item.flags.global;
+                        }
+
+                        if (typeof item.flags.multi_line === "boolean") {
+                            result.flags.multi_line = item.flags.multi_line;
+                        }
+
+                        if (typeof item.flags.insensitive === "boolean") {
+                            result.flags.insensitive = item.flags.insensitive;
+                        }
+                    }
+
+                    keywords.push(result);
                 }
             }
         }

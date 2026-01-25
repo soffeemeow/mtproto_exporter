@@ -5,6 +5,11 @@ keywords:
     # will match plain regex
     - name: woof
       pattern: 'w[oa]+f'
+      # you can also specify flags for your regex
+      flags:
+        global: true
+        multi_line: false
+        insensitive: true
 
     # will match regex wraped with word borders
     # will match 'hi, woof :3', 'woof!', 'i heard a woof' but not 'i like subwoofers'
