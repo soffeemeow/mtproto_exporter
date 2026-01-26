@@ -41,27 +41,44 @@ if (config.collectors.messages) {
 }
 
 if (config.collectors.reactions) {
-    console.log("[WARN] reactions-collector is enabled, but it is very experimental and almost does not work. i don't recommend enabling it especially for production use.")
+    console.log("[WARN] reactions-collector is enabled, but it is very experimental and almost does not work. i don't recommend enabling it especially for production use.");
     metrics.collectReactionsMetrics(tg, dp, registry);
 }
 
 if (config.keywords) {
     const counter = new metrics.KeywordsCounter(dp, rawToPatterns(config.keywords));
+    console.log("[keywords] Initialized keywords counter with", counter.keywords.length, "keywords/patterns.");
+
     registry.registerMetric(counter);
 
     if (config.watchFile) {
-        fs.watchFile(config.keywordsFile, async (curr, prev) => {
-            if (curr.mtimeMs === prev.mtimeMs) {
-                return;
-            }
-            console.log("[watch-file] Keywords file was updated. Reloading keywords configuration...");
+        const reloadConfig = async () => {
             try {
                 config.keywords = await readKeywords(config.keywordsFile);
                 counter.setKeywords(rawToPatterns(config.keywords));
+                console.log(`Loaded ${counter.keywords.length} keywords/patterns.`);
             } catch (e) {
                 console.error("Failed to read keywords file", config.keywordsFile, e);
             }
-        });
+        };
+
+        let lastMtimeMs = 0;
+        setInterval(async () => {
+            const stat = await fs.promises.stat(config.keywordsFile);
+            if (lastMtimeMs === stat.mtimeMs) {
+                return;
+            }
+
+            if (lastMtimeMs === 0 && stat.mtimeMs !== 0) {
+                lastMtimeMs = stat.mtimeMs;
+                return;
+            }
+
+            lastMtimeMs = stat.mtimeMs;
+
+            console.log("[watch-file] Keywords file was updated. Reloading keywords configuration...");
+            await reloadConfig();
+        }, config.watchFileIntervalSeconds * 1000);
     }
 }
 

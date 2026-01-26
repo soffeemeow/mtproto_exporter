@@ -15,7 +15,7 @@ export interface RawKeywordPattern {
         global: boolean;
         multi_line: boolean;
         insensitive: boolean;
-    }
+    };
 }
 
 export type RawKeywordLike = string | RawKeywordPattern;

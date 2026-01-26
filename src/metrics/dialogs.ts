@@ -50,7 +50,6 @@ export function collectDialogMetrics(tg: TelegramClient, registry: Registry) {
             for (const d of await dialogs.get()) {
                 if (d.peer.type !== "chat") continue;
                 if (d.peer.membersCount === null) continue;
-                
                 members.set({
                     peerId: d.peer.id,
                 }, d.peer.membersCount);
@@ -103,12 +102,17 @@ class DialogsHolder {
             this.isUpdating = true;
             this.dialogs = [];
             const end = this.dialogsIterDurationHistogram.startTimer();
-            for await (const d of this.tg.iterDialogs()) {
-                if (!peersConfigBoolFilter(config, d.peer.id)) {
-                    continue;
+            try {
+                for await (const d of this.tg.iterDialogs()) {
+                    if (!peersConfigBoolFilter(config, d.peer.id)) {
+                        continue;
+                    }
+                    this.dialogs.push(d);
                 }
-                this.dialogs.push(d);
+            } catch (e) {
+                console.error("Failed to iterate over telegram dialogs:", e);
             }
+
             this.dialogsIterDurationSummary.observe(end());
             this.lastUpdate = process.hrtime.bigint();
             this.isUpdating = false;

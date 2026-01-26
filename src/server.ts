@@ -24,7 +24,7 @@ export default class MetricsServer {
 
     private async _requestHandler(req: http.IncomingMessage, res: http.ServerResponse) {
         const url = new URL(`http://${req.headers.host ?? "localhost"}${req.url}`);
-        console.log(`[HTTP] ${req.method} - ${url.href} from ${req.socket.remoteAddress}:${req.socket.remotePort}`);
+        console.log(`[HTTP] ${req.method} - ${req.socket.localAddress}:${req.socket.localPort} (${url.href}) from ${req.socket.remoteAddress}:${req.socket.remotePort}`);
 
         if (req.method === "GET" && url.pathname === "/metrics") {
             try {

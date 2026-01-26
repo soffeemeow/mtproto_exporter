@@ -10,6 +10,7 @@ export interface Configuration {
     wordsCounter: boolean;
     keywordsFile: string;
     watchFile: boolean;
+    watchFileIntervalSeconds: number;
     includePeers?: number[];
     excludePeers?: number[];
     keywords?: RawKeywordLike[];
@@ -17,15 +18,17 @@ export interface Configuration {
         dialogs: boolean;
         messages: boolean;
         reactions: boolean;
-    }
+    };
     reactionsCollector: {
-        loadHistory: boolean,
-        loadHistorySize: number,
-    },
+        loadHistory: boolean;
+        loadHistorySize: number;
+    };
     messagesCollector: {
-        includeSender: boolean,
-    },
+        includeSender: boolean;
+    };
 }
+
+/* eslint-disable style/no-multi-spaces, style/key-spacing */
 
 const optionDefinitions: OptionDefinition[] = [
     { name: "bind-host",                                alias: "b", type: String,   defaultValue:   "0.0.0.0"   },
@@ -33,6 +36,7 @@ const optionDefinitions: OptionDefinition[] = [
     { name: "words-counter",                                        type: Boolean,  defaultValue:   false       },
     { name: "keywords-file",                            alias: "k", type: String                                },
     { name: "watch-file",                               alias: "w", type: Boolean,  defaultValue:   false       },
+    { name: "watch-file-interval-seconds",              alias: "W", type: Number,   defaultValue:   60          },
     { name: "include-peers",                            alias: "i", type: String,   multiple:       true        },
     { name: "exclude-peers",                            alias: "x", type: String,   multiple:       true        },
     { name: "reactions-collector",                                  type: Boolean,  defaultValue:   false       },
@@ -43,6 +47,8 @@ const optionDefinitions: OptionDefinition[] = [
     { name: "messages-collector-include-sender",                    type: Boolean,  defaultValue:   false       },
 ];
 
+/* eslint-enable style/no-multi-spaces, style/key-spacing */
+
 const cli = cmdline(optionDefinitions);
 
 const config: Configuration = {
@@ -51,6 +57,7 @@ const config: Configuration = {
     wordsCounter: cli["words-counter"],
     keywordsFile: cli["keywords-file"],
     watchFile: cli["watch-file"],
+    watchFileIntervalSeconds: cli["watch-file-interval-seconds"],
     keywords: cli["keywords-file"] ? await readKeywords(cli["keywords-file"]) : undefined,
     collectors: {
         dialogs: cli["dialogs-collector"],
@@ -94,7 +101,7 @@ export async function readKeywords(filePath: string): Promise<RawKeywordLike[]> 
                 keywords.push(item);
             } else if (typeof item === "object" && typeof item.name === "string") {
                 if (typeof item.pattern === "string") {
-                    let result = {
+                    const result = {
                         name: item.name,
                         pattern: item.pattern,
                         word: Boolean(item.word ?? false),
@@ -102,7 +109,7 @@ export async function readKeywords(filePath: string): Promise<RawKeywordLike[]> 
                             global: true,
                             multi_line: false,
                             insensitive: true,
-                        }
+                        },
                     };
 
                     if (typeof item.flags === "object") {
