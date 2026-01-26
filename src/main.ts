@@ -62,15 +62,11 @@ if (config.keywords) {
             }
         };
 
-        let lastMtimeMs = 0;
+        let lastMtimeMs = (await fs.promises.stat(config.keywordsFile)).mtimeMs;
+
         setInterval(async () => {
             const stat = await fs.promises.stat(config.keywordsFile);
             if (lastMtimeMs === stat.mtimeMs) {
-                return;
-            }
-
-            if (lastMtimeMs === 0 && stat.mtimeMs !== 0) {
-                lastMtimeMs = stat.mtimeMs;
                 return;
             }
 
