@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { Dispatcher } from "@mtcute/dispatcher";
-import { TelegramClient } from "@mtcute/node";
+import { SocksProxyTcpTransport, TcpTransport, TelegramClient } from "@mtcute/node";
 
 import { collectDefaultMetrics, Registry } from "prom-client";
 import { config, readKeywords } from "./config.js";
@@ -16,10 +16,32 @@ collectDefaultMetrics({ register: registry });
 const server = new MetricsServer(registry);
 server.listen(config.bindHost, config.port);
 
+let transport;
+
+if (env.SOCKS_PROXY) {
+    const parts = env.SOCKS_PROXY!.split(":");
+    if (parts.length !== 2) {
+        throw new Error("Malformed SOCKS_PROXY: " + env.SOCKS_PROXY);
+    }
+    
+    const port = parseInt(parts[1]);
+    if (isNaN(port) || port < 1 || port > 65535) {
+        throw new Error("Invalid port in SOCKS_PROXY: " + parts[1]);
+    }
+
+    transport = new SocksProxyTcpTransport({
+        host: parts[0],
+        port,
+    });
+} else {
+    transport = new TcpTransport();
+}
+
 const tg = new TelegramClient({
     apiId: env.API_ID,
     apiHash: env.API_HASH,
     storage: "bot-data/session",
+    transport,
 });
 
 const dp = Dispatcher.for(tg);
